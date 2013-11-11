@@ -1,6 +1,9 @@
 # BrownDispatcher
 
-TODO: Write a gem description
+This gem helps you creating a distributed webservice. Different
+individual services will be able to register into a shared redis
+database, and every request will be dispatched to the right webservice
+(depending on the prefix of the request path)
 
 ## Installation
 
@@ -18,7 +21,15 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+In config/application.rb
+
+    config.middleware.use "BrownDispatcher::Interceptor"
+
+In config/initializers/brown\_dispatcher.rb
+
+    BrownDispatcher::Service.register("http://foobar.io", "/foo", "/bar", "/baz")
+
+And this is it!
 
 ## Contributing
 
