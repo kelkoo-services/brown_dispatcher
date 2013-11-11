@@ -22,4 +22,13 @@ describe BrownDispatcher::Service do
       end
     end
   end
+
+  describe "#register" do
+    it "should store all the prefixes in redis" do
+      %w[/foo /bar].each do |prefix|
+        expect(Redis.current).to receive(:hset).with("brown-dispatcher-services", prefix, "http://foobar.io")
+      end
+      BrownDispatcher::Service.register("http://foobar.io", "/foo", "/bar")
+    end
+  end
 end

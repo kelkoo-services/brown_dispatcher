@@ -8,6 +8,12 @@ module BrownDispatcher
       @hostname = hostname
     end
 
+    def self.register(hostname, *prefixes)
+      prefixes.each do |prefix|
+        Redis.current.hset("brown-dispatcher-services", prefix, hostname)
+      end
+    end
+
     def self.find_for_request_path(request_path)
       request_path = request_path.dup
       request_path << "/" unless request_path.end_with? "/"
