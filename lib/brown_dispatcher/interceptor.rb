@@ -26,9 +26,9 @@ module BrownDispatcher
 
     def find_service_for_request_path(request_path)
       request_path = request_path.dup
-      request_path << "/" unless request_path.ends_with? "/"
+      request_path << "/" unless request_path.end_with? "/"
 
-      if prefix = Redis.current.hkeys("brown-dispatcher-services").detect { |k| request_path.starts_with? "#{k}/" }
+      if prefix = Redis.current.hkeys("brown-dispatcher-services").detect { |k| request_path.start_with? "#{k}/" }
         Redis.current.hget("brown-dispatcher-services", prefix)
       end
     end
