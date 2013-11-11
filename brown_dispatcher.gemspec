@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = BrownDispatcher::VERSION
   spec.authors       = ["ciscou"]
   spec.email         = ["francismpp@gmail.com"]
-  spec.description   = %q{TODO: Write a gem description}
-  spec.summary       = %q{TODO: Write a gem summary}
+  spec.description   = %q{Delegate HTTP requests to another webservice than can actually handle them}
+  spec.summary       = %q{Delegate HTTP requests to another webservice than can actually handle them}
   spec.homepage      = ""
   spec.license       = "MIT"
 
