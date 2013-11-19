@@ -37,7 +37,7 @@ module BrownDispatcher
     private
 
     def self.redis_key_for(http_host, request_path)
-      request_path = request_path.dup
+      request_path = (request_path || "").dup
       request_path << "/" unless request_path.end_with? "/"
 
       redis_keys.detect do |k|
