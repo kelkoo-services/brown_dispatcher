@@ -16,7 +16,9 @@ module BrownDispatcher
     end
 
     def to_rack_result
-      [ @res.code, @res.headers, [ @res.body ] ]
+      headers = @res.headers
+      headers.delete("transfer-encoding")
+      [ @res.code, headers, [ @res.body ] ]
     end
   end
 end
