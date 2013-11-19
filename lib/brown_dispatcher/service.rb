@@ -27,8 +27,8 @@ module BrownDispatcher
       end
     end
 
-    def self.find_for_request_path(request_path)
-      if key = redis_key_for(request_path)
+    def self.find_for_http_host_and_request_path(http_host, request_path)
+      if key = redis_key_for(http_host, request_path)
         hostname = Redis.current.hget(key, "hostname")
         new(hostname)
       end
@@ -36,12 +36,13 @@ module BrownDispatcher
 
     private
 
-    def self.redis_key_for(request_path)
+    def self.redis_key_for(http_host, request_path)
       request_path = request_path.dup
       request_path << "/" unless request_path.end_with? "/"
 
       redis_keys.detect do |k|
         next unless Redis.current.hget(k, "enabled") == "true"
+        next if http_host == Redis.current.hget(k, "hostname").sub(%r{^https?://}, "")
 
         prefix = k.sub %r{^brown-dispatcher-services:}, ""
         request_path.start_with? "#{prefix}/"
