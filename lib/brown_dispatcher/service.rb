@@ -42,7 +42,7 @@ module BrownDispatcher
 
       redis_keys.detect do |k|
         next unless redis.hget(k, "enabled") == "true"
-        next if http_host == redis.hget(k, "hostname").sub(%r{^https?://}, "")
+        next if same_host?(http_host, redis.hget(k, "hostname"))
 
         prefix = k.sub %r{^brown-dispatcher-services:}, ""
         request_path.start_with? "#{prefix}/"
@@ -57,6 +57,12 @@ module BrownDispatcher
       redis_keys.select do |k|
         redis.hget(k, "hostname") == hostname
       end
+    end
+
+    def self.same_host?(http_host, redis_host)
+      redis_host.sub!(%r{^https?://}, "")
+      redis_host.sub!(%r{^[^:]+:[^@]+@}, "")
+      http_host == redis_host
     end
 
     def self.redis
