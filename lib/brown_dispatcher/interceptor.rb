@@ -9,7 +9,7 @@ module BrownDispatcher
       http_host    = env["HTTP_HOST"]
 
       if service = Service.find_for_http_host_and_request_path(http_host, request_path)
-        dispatcher = Dispatcher.new(service, request_path, env)
+        dispatcher = Dispatcher.new(service.hostname, request_path, env)
         dispatcher.dispatch
         dispatcher.to_rack_result
       else

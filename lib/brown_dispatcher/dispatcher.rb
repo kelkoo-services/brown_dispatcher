@@ -6,12 +6,12 @@ module BrownDispatcher
 
     no_follow true
 
-    def initialize(service, request_path, env)
-      @service, @request_path, @env = service, request_path, env
+    def initialize(hostname, request_path, env)
+      @hostname, @request_path, @env = hostname, request_path, env
     end
 
     def dispatch
-      uri = "#{@service.hostname}#{@request_path}"
+      uri = "#{@hostname}#{@request_path}"
       @res = get_response(uri)
     end
 
