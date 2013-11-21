@@ -36,7 +36,7 @@ describe BrownDispatcher::Service do
         expect(redis).to receive(:hget).with("brown-dispatcher-services:/baz", "hostname").and_return("foo.biz")
       end
 
-      it "should return new Service with appropiate hostname" do
+      it "should return nil" do
         BrownDispatcher::Service.find_for_http_host_and_request_path("example.com", "/fuzz/bizz").should be_nil
       end
     end
