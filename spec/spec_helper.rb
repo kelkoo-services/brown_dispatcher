@@ -20,4 +20,5 @@ RSpec.configure do |config|
   config.order = 'random'
 
   config.before { FakeWeb.allow_net_connect = false }
+  config.after  { FakeWeb.clean_registry }
 end
