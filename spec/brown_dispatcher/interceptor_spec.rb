@@ -17,8 +17,8 @@ describe BrownDispatcher::Interceptor do
   describe "requests" do
     it "should delegate to the right service, if any" do
       BrownDispatcher::Service.should_receive(:find_for_http_host_and_request_path).with("example.com", "/foo/bar").and_return(service)
-      BrownDispatcher::Dispatcher.should_receive(:new).with(service, "/foo/bar").and_return(dispatcher)
-      dispatcher.should_receive(:dispatch).with(env)
+      BrownDispatcher::Dispatcher.should_receive(:new).with(service, "/foo/bar", env).and_return(dispatcher)
+      dispatcher.should_receive(:dispatch)
       dispatcher.should_receive(:to_rack_result).and_return([ 200, {}, [ "response from http://foobar.io/foo/bar" ] ])
       interceptor.call(env).should == [ 200, {}, [ "response from http://foobar.io/foo/bar" ] ]
     end
