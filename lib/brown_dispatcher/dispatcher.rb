@@ -2,26 +2,36 @@ require "httparty"
 
 module BrownDispatcher
   class Dispatcher
+    include HTTParty
+
+    no_follow true
+
     def initialize(service, request_path)
       @service, @request_path = service, request_path
     end
 
     def dispatch(env)
       uri = "#{@service.hostname}#{@request_path}"
-      @res = if env["REQUEST_METHOD"] == "POST"
-               HTTParty.post uri, body: post_params_for(env)
-             else
-               HTTParty.get uri, query: get_params_for(env)
-            end
+      @res = get_response(env, uri)
     end
 
     def to_rack_result
-      headers = @res.headers
+      headers = @res.to_hash
       headers.delete("transfer-encoding")
       [ @res.code, headers, [ @res.body ] ]
     end
 
     private
+
+    def get_response(env, uri)
+      if env["REQUEST_METHOD"] == "POST"
+        self.class.post uri, body: post_params_for(env)
+      else
+        self.class.get uri, query: get_params_for(env)
+      end
+    rescue HTTParty::RedirectionTooDeep => e
+      e.response
+    end
 
     def get_params_for(env)
       query_string = env["QUERY_STRING"] || ""
