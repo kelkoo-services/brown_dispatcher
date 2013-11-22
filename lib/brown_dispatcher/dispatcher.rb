@@ -24,18 +24,18 @@ module BrownDispatcher
     private
 
     def get_response(uri)
-      user_auth = get_user_auth_from(uri)
+      basic_auth = get_basic_auth_from(uri)
 
       if @env["REQUEST_METHOD"] == "POST"
-        self.class.post uri, body: post_params, user_auth: user_auth
+        self.class.post uri, body: post_params, basic_auth: basic_auth
       else
-        self.class.get uri, query: get_params, user_auth: user_auth
+        self.class.get uri, query: get_params, basic_auth: basic_auth
       end
     rescue HTTParty::RedirectionTooDeep => e
       e.response
     end
 
-    def get_user_auth_from(uri)
+    def get_basic_auth_from(uri)
       userinfo = URI.parse(uri).userinfo
       if userinfo
         username, password = userinfo.split(":")
