@@ -16,7 +16,7 @@ module BrownDispatcher
     end
 
     def to_rack_result
-      headers = @res.to_hash
+      headers = @res.respond_to?(:headers) ? @res.headers : @res.to_hash
       headers.delete("transfer-encoding")
       [ @res.code, headers, [ @res.body ] ]
     end
