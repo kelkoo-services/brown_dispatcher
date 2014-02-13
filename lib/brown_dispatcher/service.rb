@@ -51,6 +51,14 @@ module BrownDispatcher
     end
 
     def self.redis_keys
+      if redis_supports_scan?
+        redis_keys_using_scan
+      else
+        redis_keys_using_keys
+      end
+    end
+
+    def self.redis_keys_using_scan
       cursor = "0"
       keys = []
       begin
@@ -58,6 +66,15 @@ module BrownDispatcher
         keys += new_keys
       end until cursor == "0"
       keys
+    end
+
+    def self.redis_keys_using_keys
+      redis.keys("brown-dispatcher-services:*")
+    end
+
+    def self.redis_supports_scan?
+      redis_version = redis.info["redis_version"].split(".").map(&:to_i)
+      (redis_version <=> [2, 8, 0]) >= 0
     end
 
     def self.redis_keys_for_hostname(hostname)
