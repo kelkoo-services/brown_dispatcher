@@ -13,6 +13,7 @@ module BrownDispatcher
         redis.hset("brown-dispatcher-services:#{prefix}", "hostname", hostname)
         redis.hset("brown-dispatcher-services:#{prefix}", "enabled", true)
       end
+      new(hostname)
     end
 
     def enable
