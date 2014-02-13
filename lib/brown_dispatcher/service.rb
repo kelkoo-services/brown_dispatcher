@@ -50,7 +50,13 @@ module BrownDispatcher
     end
 
     def self.redis_keys
-      redis.keys("brown-dispatcher-services:*")
+      cursor = "0"
+      keys = []
+      begin
+        cursor, new_keys = redis.scan(cursor, match: "brown-dispatcher-services:*")
+        keys += new_keys
+      end until cursor == "0"
+      keys
     end
 
     def self.redis_keys_for_hostname(hostname)
