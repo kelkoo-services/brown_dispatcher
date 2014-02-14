@@ -1,8 +1,7 @@
 module BrownDispatcher
   class Configuration
-    attr_accessor :redis
-
-    def initialize
+    def redis=(redis)
+      @redis = redis
     end
 
     def redis

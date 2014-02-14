@@ -10,6 +10,7 @@ module BrownDispatcher
 
     def self.register(hostname, *prefixes)
       prefixes.each do |prefix|
+        redis.lpush("brown-dispatcher-services", prefix)
         redis.hset("brown-dispatcher-services:#{prefix}", "hostname", hostname)
         redis.hset("brown-dispatcher-services:#{prefix}", "enabled", true)
       end
@@ -51,33 +52,9 @@ module BrownDispatcher
     end
 
     def self.redis_keys
-      if redis_supports_scan?
-        redis_keys_using_scan
-      else
-        redis_keys_using_keys
+      redis.lrange("brown-dispatcher-services", 0, -1).map do |prefix|
+        "brown-dispatcher-services:#{prefix}"
       end
-    end
-
-    def self.redis_keys_using_scan
-      cursor = "0"
-      keys = []
-      begin
-        cursor, new_keys = redis.scan(cursor, match: "brown-dispatcher-services:*")
-        keys += new_keys
-      end until cursor == "0"
-      keys
-    end
-
-    def self.redis_keys_using_keys
-      redis.keys("brown-dispatcher-services:*")
-    end
-
-    def self.redis_supports_scan?
-      (redis_version <=> [2, 8, 0]) >= 0
-    end
-
-    def self.redis_version
-      @redis_version ||= redis.info["redis_version"].split(".").map(&:to_i)
     end
 
     def self.redis_keys_for_hostname(hostname)
