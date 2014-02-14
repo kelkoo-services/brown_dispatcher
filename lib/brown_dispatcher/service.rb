@@ -51,6 +51,20 @@ module BrownDispatcher
     end
 
     def self.redis_keys
+      cached_redis_keys || fetch_redis_keys
+    end
+
+    def self.cached_redis_keys
+      @cached_redis_keys_timestamp ||= 0
+      if Time.now.to_i - @cached_redis_keys_timestamp < 60
+        @cached_redis_keys
+      else
+        @cached_redis_keys_timestamp = Time.now.to_i
+        @cached_redis_keys = fetch_redis_keys
+      end
+    end
+
+    def self.fetch_redis_keys
       if redis_supports_scan?
         redis_keys_using_scan
       else
@@ -72,14 +86,6 @@ module BrownDispatcher
       redis.keys("brown-dispatcher-services:*")
     end
 
-    def self.redis_supports_scan?
-      (redis_version <=> [2, 8, 0]) >= 0
-    end
-
-    def self.redis_version
-      @redis_version ||= redis.info["redis_version"].split(".").map(&:to_i)
-    end
-
     def self.redis_keys_for_hostname(hostname)
       redis_keys.select do |k|
         redis.hget(k, "hostname") == hostname
@@ -94,6 +100,10 @@ module BrownDispatcher
 
     def self.redis
       BrownDispatcher.configuration.redis
+    end
+
+    def self.redis_supports_scan?
+      BrownDispatcher.configuration.redis_supports_scan?
     end
 
     def redis
