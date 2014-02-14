@@ -10,6 +10,7 @@ module BrownDispatcher
 
     def self.register(hostname, *prefixes)
       prefixes.each do |prefix|
+        redis.lpush("brown-dispatcher-services", prefix)
         redis.hset("brown-dispatcher-services:#{prefix}", "hostname", hostname)
         redis.hset("brown-dispatcher-services:#{prefix}", "enabled", true)
       end
@@ -51,39 +52,9 @@ module BrownDispatcher
     end
 
     def self.redis_keys
-      cached_redis_keys || fetch_redis_keys
-    end
-
-    def self.cached_redis_keys
-      @cached_redis_keys_timestamp ||= 0
-      if Time.now.to_i - @cached_redis_keys_timestamp < 60
-        @cached_redis_keys
-      else
-        @cached_redis_keys_timestamp = Time.now.to_i
-        @cached_redis_keys = fetch_redis_keys
+      redis.lrange("brown-dispatcher-services", 0, -1).map do |prefix|
+        "brown-dispatcher-services:#{prefix}"
       end
-    end
-
-    def self.fetch_redis_keys
-      if redis_supports_scan?
-        redis_keys_using_scan
-      else
-        redis_keys_using_keys
-      end
-    end
-
-    def self.redis_keys_using_scan
-      cursor = "0"
-      keys = []
-      begin
-        cursor, new_keys = redis.scan(cursor, match: "brown-dispatcher-services:*")
-        keys += new_keys
-      end until cursor == "0"
-      keys
-    end
-
-    def self.redis_keys_using_keys
-      redis.keys("brown-dispatcher-services:*")
     end
 
     def self.redis_keys_for_hostname(hostname)
@@ -100,10 +71,6 @@ module BrownDispatcher
 
     def self.redis
       BrownDispatcher.configuration.redis
-    end
-
-    def self.redis_supports_scan?
-      BrownDispatcher.configuration.redis_supports_scan?
     end
 
     def redis
