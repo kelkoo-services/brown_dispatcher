@@ -73,8 +73,11 @@ module BrownDispatcher
     end
 
     def self.redis_supports_scan?
-      redis_version = redis.info["redis_version"].split(".").map(&:to_i)
       (redis_version <=> [2, 8, 0]) >= 0
+    end
+
+    def self.redis_version
+      @redis_version ||= redis.info["redis_version"].split(".").map(&:to_i)
     end
 
     def self.redis_keys_for_hostname(hostname)
