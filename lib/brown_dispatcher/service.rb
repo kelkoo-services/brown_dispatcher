@@ -10,7 +10,7 @@ module BrownDispatcher
 
     def self.register(hostname, *prefixes)
       prefixes.each do |prefix|
-        redis.lpush("brown-dispatcher-services", prefix)
+        redis.sadd("brown-dispatcher-services", prefix)
         redis.hset("brown-dispatcher-services:#{prefix}", "hostname", hostname)
         redis.hset("brown-dispatcher-services:#{prefix}", "enabled", true)
       end
@@ -52,7 +52,7 @@ module BrownDispatcher
     end
 
     def self.redis_keys
-      redis.lrange("brown-dispatcher-services", 0, -1).map do |prefix|
+      redis.smembers("brown-dispatcher-services").map do |prefix|
         "brown-dispatcher-services:#{prefix}"
       end
     end
