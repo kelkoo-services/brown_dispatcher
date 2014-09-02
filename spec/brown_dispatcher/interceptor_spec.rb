@@ -4,6 +4,7 @@ describe BrownDispatcher::Interceptor do
   let(:app) { double("Application") }
   let(:env) do
     {
+      "X-BROWN-DISPATCHER" => "true",
       "HTTP_HOST" => "example.com",
       "REQUEST_METHOD" => "GET",
       "REQUEST_PATH" => "/foo/bar"
